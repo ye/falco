@@ -74,7 +74,7 @@ function run_tests() {
     rm -rf /tmp/falco_outputs
     mkdir /tmp/falco_outputs
     TEST_RC=0
-    for mult in $SCRIPTDIR/falco_traces.yaml $SCRIPTDIR/falco_tests.yaml; do
+    for mult in $SCRIPTDIR/falco_traces.yaml $SCRIPTDIR/falco_tests.yaml $SCRIPTDIR/falco_k8s_audit_tests.yaml; do
 	CMD="avocado run --multiplex $mult --job-results-dir $SCRIPTDIR/job-results -- $SCRIPTDIR/falco_test.py"
 	echo "Running: $CMD"
 	$CMD
@@ -86,7 +86,7 @@ function run_tests() {
     done
 }
 
-download_trace_files
+#download_trace_files
 prepare_multiplex_file
 run_tests
 exit $TEST_RC
