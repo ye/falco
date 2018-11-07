@@ -19,24 +19,22 @@ matrix:
   include:
     # works on Precise and Trusty
     - os: linux
+      compiler: gcc
+      env: compiler=g++-4.8
       addons:
         apt:
-          sources:
-            - ubuntu-toolchain-r-test
-          packages:
-            - g++-4.8
-      env:
-         - MATRIX_EVAL="CC=gcc-4.8 && CXX=g++-4.8"
+          sources: ['ubuntu-toolchain-r-test']
+          packages: ['g++-4.8', 'ninja-build']
+
 language: c
-env:
-    - BUILD_TYPE=Debug
-    - BUILD_TYPE=Release
 sudo: required
 services:
     - docker
 before_install:
-    - eval "${MATRIX_EVAL}"
+    - if [[ "${COMPILER}" != "" ]]; then export CXX=${COMPILER}; fi
 install:
+    - uname -a
+    - $CXX --version
     - sudo apt-get install rpm linux-headers-$(uname -r) libelf-dev
     - git clone https://github.com/draios/sysdig.git ../sysdig
     - sudo apt-get install -y python-pip libvirt-dev jq dkms
