@@ -189,7 +189,8 @@ void falco_webserver::start()
 	}
 
 	std::vector<std::string> cpp_options = {
-		"listening_ports", to_string(m_config->m_webserver_listen_port)
+		"listening_ports", to_string(m_config->m_webserver_listen_port),
+		"num_threads", to_string(1)
 	};
 
 	try {
