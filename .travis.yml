@@ -37,6 +37,7 @@ install:
     - $CXX --version
     - sudo apt-get install rpm linux-headers-$(uname -r) libelf-dev
     - git clone https://github.com/draios/sysdig.git ../sysdig
+    - pushd ../sysdig && git checkout lua-parser-interfaces && popd
     - sudo apt-get install -y python-pip libvirt-dev jq dkms
     - cd ..
     - curl -Lo avocado-36.0-tar.gz https://github.com/avocado-framework/avocado/archive/36.0lts.tar.gz
