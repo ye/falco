@@ -20,7 +20,7 @@ matrix:
     # works on Precise and Trusty
     - os: linux
       compiler: gcc
-      env: compiler=g++-4.8
+      env: COMPILER=g++-4.8
       addons:
         apt:
           sources: ['ubuntu-toolchain-r-test']
