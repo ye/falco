@@ -86,7 +86,7 @@ function run_tests() {
     done
 }
 
-#download_trace_files
+download_trace_files
 prepare_multiplex_file
 run_tests
 exit $TEST_RC
