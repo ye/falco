@@ -16,18 +16,13 @@
 # limitations under the License.
 #
 language: c
-env:
-    - BUILD_TYPE=Debug
-    - BUILD_TYPE=Release
 sudo: required
 services:
     - docker
 before_install:
-    - sudo add-apt-repository -y ppa:ubuntu-toolchain-r/test
     - sudo apt-get update
 install:
-    - sudo apt-get --force-yes install g++-4.8
-    - sudo apt-get install rpm linux-headers-$(uname -r) libelf-dev
+    - sudo apt-get install rpm linux-headers-$(uname -r)
     - git clone https://github.com/draios/sysdig.git ../sysdig
     - sudo apt-get install -y python-pip libvirt-dev jq dkms
     - cd ..
@@ -37,23 +32,19 @@ install:
     - sed -e 's/libvirt-python>=1.2.9/libvirt-python>=1.2.9,<4.1.0/' < requirements.txt  > /tmp/requirements.txt && mv /tmp/requirements.txt ./requirements.txt
     - sudo -H pip install -r requirements.txt
     - sudo python setup.py install
-    - cd ../falco
+    - cd ..
 before_script:
     - export KERNELDIR=/lib/modules/$(uname -r)/build
 script:
     - set -e
-    - export CC="gcc-4.8"
-    - export CXX="g++-4.8"
-    - mkdir build
-    - cd build
-    - cmake .. -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DDRAIOS_DEBUG_FLAGS="-D_DEBUG -DNDEBUG"
-    - make VERBOSE=1
-    - make package
-    - cp falco*.deb ../docker/local
-    - cd ../docker/local
+    - mkdir -p builds/falco
+    - docker run -it -v $PWD/builds:/builds -v $PWD:/code falcosecurity/falco-builder:latest cmake
+    - docker run -it -v $PWD/builds:/builds -v $PWD:/code falcosecurity/falco-builder:latest package
+    - cp builds/falco/Release/falco*.deb falco/docker/local
+    - cd falco/docker/local
     - docker build -t sysdig/falco:test .
     - cd ../..
-    - sudo test/run_regression_tests.sh $TRAVIS_BRANCH
+    - sudo test/run_regression_tests.sh --branch $TRAVIS_BRANCH --build ../builds/falco/Release
 notifications:
   webhooks:
     urls:

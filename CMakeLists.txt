@@ -372,7 +372,7 @@ else()
 		URL_MD5 "4a4bced818da0b9ae7fc8ebc690792a7"
 		BUILD_COMMAND ${CMD_MAKE}
 		BUILD_IN_SOURCE 1
-		CONFIGURE_COMMAND ./bootstrap && ./configure
+		CONFIGURE_COMMAND ./bootstrap && ./configure --enable-shared=no --with-pic=yes
 		INSTALL_COMMAND "")
 endif()
 

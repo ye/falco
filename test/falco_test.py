@@ -34,7 +34,10 @@ class FalcoTest(Test):
         """
         Load the sysdig kernel module if not already loaded.
         """
-        self.falcodir = self.params.get('falcodir', '/', default=os.path.join(self.basedir, '../build'))
+        if os.environ.get('FALCODIR') != "None":
+            self.falcodir = self.params.get('falcodir', '/', default=os.path.join(self.basedir, '../build'))
+        else:
+            self.falcodir = os.environ.get('FALCODIR')
 
         self.stdout_contains = self.params.get('stdout_contains', '*', default='')
         self.stderr_contains = self.params.get('stderr_contains', '*', default='')

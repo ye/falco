@@ -18,15 +18,51 @@
 #
 SCRIPT=$(readlink -f $0)
 SCRIPTDIR=$(dirname $SCRIPT)
-BRANCH=$1
+
+usage() {
+    echo "Usage: $0 [options]"
+    echo ""
+    echo "Options:"
+    echo "  -h/--help: show this help"
+    echo "  -b/--build: path to build directory"
+    echo "  -B/--branch: an alternate branch name to use for trace files"
+}
+
+OPTS=`getopt -o hb:B: --long help,build:,branch: -n $0 -- "$@"`
+
+if [ $? != 0 ]; then
+    echo "Exiting" >&2
+    exit 1
+fi
+
+eval set -- "$OPTS"
+
+BRANCH=
+BUILD="$HOME/builds/falco/Release"
+
+while true; do
+    case "$1" in
+	-h | --help ) usage; exit 1;;
+	-b | --build ) BUILD="$2"; shift 2;;
+	-B | --branch ) BRANCH="$2"; shift 2;;
+	* ) break;;
+    esac
+done
+
+if [ -z $BUILD ]; then
+    echo "A build directory must be specified. Not continuing."
+    exit 1
+fi
 
 function download_trace_files() {
     echo "branch=$BRANCH"
     for TRACE in traces-positive traces-negative traces-info ; do
-	rm -rf $SCRIPTDIR/$TRACE
-	curl -fso $SCRIPTDIR/$TRACE.zip https://s3.amazonaws.com/download.draios.com/falco-tests/$TRACE-$BRANCH.zip || curl -fso $SCRIPTDIR/$TRACE.zip https://s3.amazonaws.com/download.draios.com/falco-tests/$TRACE.zip &&
-	unzip -d $SCRIPTDIR $SCRIPTDIR/$TRACE.zip &&
-	rm -rf $SCRIPTDIR/$TRACE.zip
+	if [ ! -d $SCRIPTDIR/$TRACE ]; then
+	    rm -rf $SCRIPTDIR/$TRACE && \
+	    curl -fso $SCRIPTDIR/$TRACE.zip https://s3.amazonaws.com/download.draios.com/falco-tests/$TRACE-$BRANCH.zip || curl -fso $SCRIPTDIR/$TRACE.zip https://s3.amazonaws.com/download.draios.com/falco-tests/$TRACE.zip && \
+	    unzip -d $SCRIPTDIR $SCRIPTDIR/$TRACE.zip && \
+            rm -f $SCRIPTDIR/$TRACE.zip
+	fi
     done
 }
 
@@ -76,8 +112,8 @@ function run_tests() {
     TEST_RC=0
     for mult in $SCRIPTDIR/falco_traces.yaml $SCRIPTDIR/falco_tests.yaml; do
 	CMD="avocado run --multiplex $mult --job-results-dir $SCRIPTDIR/job-results -- $SCRIPTDIR/falco_test.py"
-	echo "Running: $CMD"
-	$CMD
+	echo "Running: FALCODIR=$BUILD $CMD"
+	FALCODIR=$BUILD $CMD
 	RC=$?
 	TEST_RC=$((TEST_RC+$RC))
 	if [ $RC -ne 0 ]; then
