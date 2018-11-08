@@ -20,11 +20,11 @@ matrix:
     # works on Precise and Trusty
     - os: linux
       compiler: gcc
-      env: COMPILER=g++-4.8
+      env: COMPILER=g++-4.9
       addons:
         apt:
           sources: ['ubuntu-toolchain-r-test']
-          packages: ['g++-4.8', 'ninja-build']
+          packages: ['g++-4.9', 'ninja-build']
 
 language: c
 sudo: required
