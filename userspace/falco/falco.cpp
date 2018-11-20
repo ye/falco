@@ -1024,7 +1024,7 @@ int falco_init(int argc, char **argv)
 
 		if(trace_filename.empty() && config.m_webserver_enabled)
 		{
-			falco_logger::log(LOG_INFO, "Starting internal webserver, listening on port " + to_string(config.m_webserver_listen_port) + "\n");
+			falco_logger::log(LOG_INFO, "Starting internal webserver, listening on port " + config.m_webserver_listen_port + "\n");
 			webserver.init(&config, engine, outputs);
 			webserver.start();
 		}
