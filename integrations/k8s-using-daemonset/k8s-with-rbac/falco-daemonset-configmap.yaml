@@ -21,6 +21,8 @@ spec:
             privileged: true
 # Uncomment the 3 lines below to enable eBPF support for Falco. 
 # This allows Falco to run on Google COS and Minikube.
+# Leave blank for the default probe location, or set to the path
+# of a precompiled probe.
 #          env:
 #          - name: SYSDIG_BPF_PROBE
 #            value: ""
@@ -42,9 +44,12 @@ spec:
             - mountPath: /host/usr
               name: usr-fs
               readOnly: true
-            - mountPath: /host/etc
-              name: etc-fs
+            - mountPath: /host/etc/os-version
+              name: etc-os-release-fs
               readOnly: true
+            - mountPath: /host/etc/VERSION
+              name: etc-version-fs
+              readOnly: true  
             - mountPath: /etc/falco
               name: falco-config
       volumes:
@@ -66,9 +71,14 @@ spec:
         - name: usr-fs
           hostPath:
             path: /usr
-        - name: etc-fs
+        - name: etc-os-release-fs
           hostPath:
-            path: /etc
+            path: /etc/os-release
+            type: File
+        - name: etc-version-fs
+          hostPath:
+            path: /etc/VERSION
+            type: FileOrCreate    
         - name: falco-config
           configMap:
             name: falco-config
